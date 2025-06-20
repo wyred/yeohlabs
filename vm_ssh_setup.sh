@@ -43,7 +43,6 @@ fi
 echo "Installing public key for ${SSH_USER}..."
 ( [ -f "${AUTHORIZED_KEYS_FILE}" ] && [ -s "${AUTHORIZED_KEYS_FILE}" ] && [[ $(tail -c1 "${AUTHORIZED_KEYS_FILE}") != '' ]] && echo '' ; echo "${PUBLIC_KEY_CONTENT}" ) >> "${AUTHORIZED_KEYS_FILE}"
 
-
 # Set correct permissions for the authorized_keys file.
 echo "Setting permissions for ${AUTHORIZED_KEYS_FILE}..."
 chown "${SSH_USER}:${SSH_USER}" "${AUTHORIZED_KEYS_FILE}"
@@ -53,15 +52,18 @@ echo "Public key installed successfully."
 
 # Disable password authentication in sshd_config.
 echo "Disabling password authentication in SSH configuration..."
-sed -i 's/^#?PasswordAuthentication .*/PasswordAuthentication no/' "${SSH_CONFIG_FILE}"
+sed -i 's/^#\?PasswordAuthentication .*/PasswordAuthentication no/' "${SSH_CONFIG_FILE}"
 
-# Restart the SSH service to apply changes.
-echo "Restarting SSH service..."
-# Use systemctl if available, otherwise try the service command.
-if command -v systemctl &> /dev/null; then
-    systemctl restart sshd
+# Enable and restart the SSH service to apply changes.
+echo "Enabling and restarting SSH service..."
+if command -v systemctl >/dev/null 2>&1; then
+  systemctl enable ssh || systemctl enable sshd
+  systemctl restart ssh || systemctl restart sshd
+elif command -v service >/dev/null 2>&1; then
+  service ssh restart || service sshd restart
 else
-    service sshd restart
+  echo "ERROR: Could not find a way to restart the SSH service. Please restart it manually." >&2
+  exit 1
 fi
 
 echo "--- SSH setup complete! ---"
