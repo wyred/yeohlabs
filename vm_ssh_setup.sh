@@ -7,8 +7,15 @@ PUBLIC_KEY_CONTENT="ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIAsqaolfv6xbE6PDskAu+c2p
 # The script defaults to the user running it.
 SSH_USER=$(whoami)
 
+# Determine the correct home directory for the user (handle root separately)
+if [ "$SSH_USER" = "root" ]; then
+  USER_HOME="/root"
+else
+  USER_HOME="/home/${SSH_USER}"
+fi
+
 # SSH directory and authorized_keys file path.
-SSH_DIR="/home/${SSH_USER}/.ssh"
+SSH_DIR="${USER_HOME}/.ssh"
 AUTHORIZED_KEYS_FILE="${SSH_DIR}/authorized_keys"
 
 # SSH configuration file path.
