@@ -4,7 +4,7 @@
 PUBLIC_KEY_CONTENT="ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIAsqaolfv6xbE6PDskAu+c2po1oaD+HpVNePLLljAwdD yeohlabs_vm"
 
 # Prompt the user for the username to use.
-read -rp "Enter the username to install the SSH key for: " SSH_USER
+read -rp "Enter the username to install the SSH key for: " SSH_USER < /dev/tty
 if [ -z "$SSH_USER" ]; then
   echo "ERROR: Username cannot be empty." >&2
   exit 1
